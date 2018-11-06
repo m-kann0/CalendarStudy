@@ -3,7 +3,9 @@ package com.kann0.calendarstudy;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.os.Handler;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -24,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         readCalendars();
+
+        registerEventObserver();
     }
 
     @Override
@@ -60,5 +64,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "readCalendars: " + calendar);
             }
         }
+    }
+
+    private final ContentObserver observer = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+
+            Log.d(TAG, "onChange: DETECT!!");
+        }
+    };
+
+    private void registerEventObserver() {
+        getContentResolver()
+                .registerContentObserver(CalendarContract.Events.CONTENT_URI, true, this.observer);
     }
 }
